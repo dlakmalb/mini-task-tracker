@@ -24,23 +24,23 @@ class TaskRepository extends ServiceEntityRepository
     public function findByProjectAndFilters(
         Project $project,
         ?TaskStatus $status,
-        ?string $search,
+        ?string $title,
     ): array {
-        $qb = $this->createQueryBuilder('task')
+        $queryBuilder = $this->createQueryBuilder('task')
             ->andWhere('task.project = :project')
             ->setParameter('project', $project)
             ->orderBy('task.createdAt', 'DESC');
 
         if (null !== $status) {
-            $qb->andWhere('task.status = :status')
+            $queryBuilder->andWhere('task.status = :status')
                ->setParameter('status', $status->value);
         }
 
-        if (null !== $search && '' !== $search) {
-            $qb->andWhere('LOWER(task.title) LIKE :q')
-               ->setParameter('q', '%'.mb_strtolower($search).'%');
+        if (null !== $title && '' !== $title) {
+            $queryBuilder->andWhere('LOWER(task.title) LIKE :title')
+               ->setParameter('title', '%'.mb_strtolower($title).'%');
         }
 
-        return $qb->getQuery()->getResult();
+        return $queryBuilder->getQuery()->getResult();
     }
 }

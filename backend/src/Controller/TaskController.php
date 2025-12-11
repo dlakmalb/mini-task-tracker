@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Dto\TaskCreateRequest;
-use App\Dto\TaskUpdateRequest;
+use App\DTO\CreateTaskRequestDTO;
+use App\DTO\UpdateTaskRequestDTO;
 use App\Entity\Task;
 use App\Enum\TaskPriority;
 use App\Enum\TaskStatus;
@@ -24,6 +24,9 @@ class TaskController
     ) {
     }
 
+    /**
+     * Get tasks related to a project for given params.
+     */
     #[Route('/api/projects/{projectId}/tasks', name: 'api_project_tasks_index', methods: ['GET'])]
     public function index(int $projectId, Request $request): JsonResponse
     {
@@ -38,10 +41,10 @@ class TaskController
 
         // Parse query parameters
         $statusParam = $request->query->get('status');
-        $q = $request->query->get('q');
-        $search = $q ? trim($q) : null;
+        $titleParam = $request->query->get('title');
 
         $status = null;
+        $title = $titleParam ? trim($titleParam) : null;
 
         if (null !== $statusParam && '' !== $statusParam) {
             try {
@@ -55,24 +58,20 @@ class TaskController
         }
 
         // Get tasks from service
-        $tasks = $this->taskService->getTasksForProject($project, $status, $search);
+        $tasks = $this->taskService->getTasksForProject($project, $status, $title);
 
         // Format response data
-        $data = array_map(static function ($task) {
-            return [
-                'id' => $task->getId(),
-                'project_id' => $task->getProject()->getId(),
-                'title' => $task->getTitle(),
-                'description' => $task->getDescription(),
-                'status' => $task->getStatus()->value,
-                'priority' => $task->getPriority()->value,
-                'created_at' => $task->getCreatedAt()->format(DATE_ATOM),
-            ];
-        }, $tasks);
+        $data = array_map(
+            fn (Task $task) => $this->organiseTaskData($task),
+            $tasks
+        );
 
         return new JsonResponse($data, JsonResponse::HTTP_OK);
     }
 
+    /**
+     * Create a task for a project.
+     */
     #[Route('/api/projects/{projectId}/tasks', name: 'api_project_tasks_create', methods: ['POST'])]
     public function create(
         int $projectId,
@@ -90,7 +89,7 @@ class TaskController
 
         $data = json_decode($request->getContent(), true) ?? [];
 
-        $dto = new TaskCreateRequest();
+        $dto = new CreateTaskRequestDTO();
         $dto->title = $data['title'] ?? null;
         $dto->description = $data['description'] ?? null;
         $dto->status = $data['status'] ?? null;
@@ -123,15 +122,7 @@ class TaskController
 
         $task = $this->taskService->createForProject($project, $dto);
 
-        return new JsonResponse([
-            'id' => $task->getId(),
-            'project_id' => $task->getProject()->getId(),
-            'title' => $task->getTitle(),
-            'description' => $task->getDescription(),
-            'status' => $task->getStatus()->value,
-            'priority' => $task->getPriority()->value,
-            'created_at' => $task->getCreatedAt()->format(DATE_ATOM),
-        ], JsonResponse::HTTP_CREATED);
+        return new JsonResponse($this->organiseTaskData($task), JsonResponse::HTTP_CREATED);
     }
 
     #[Route('/api/tasks/{id}', name: 'api_tasks_update', methods: ['PATCH'])]
@@ -148,7 +139,7 @@ class TaskController
 
         $data = json_decode($request->getContent(), true) ?? [];
 
-        $dto = new TaskUpdateRequest();
+        $dto = new UpdateTaskRequestDTO();
         $dto->status = $data['status'] ?? null;
         $dto->priority = $data['priority'] ?? null;
 
@@ -183,15 +174,7 @@ class TaskController
             );
         }
 
-        return new JsonResponse([
-            'id' => $task->getId(),
-            'project_id' => $task->getProject()->getId(),
-            'title' => $task->getTitle(),
-            'description' => $task->getDescription(),
-            'status' => $task->getStatus()->value,
-            'priority' => $task->getPriority()->value,
-            'created_at' => $task->getCreatedAt()->format(DATE_ATOM),
-        ], JsonResponse::HTTP_OK);
+        return new JsonResponse($this->organiseTaskData($task), JsonResponse::HTTP_OK);
     }
 
     #[Route('/api/tasks/{id}', name: 'api_tasks_delete', methods: ['DELETE'])]
@@ -209,5 +192,18 @@ class TaskController
         $this->taskService->deleteTask($task);
 
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
+    }
+
+    private function organiseTaskData(Task $task): array
+    {
+        return [
+            'id' => $task->getId(),
+            'project_id' => $task->getProject()->getId(),
+            'title' => $task->getTitle(),
+            'description' => $task->getDescription(),
+            'status' => $task->getStatus()->value,
+            'priority' => $task->getPriority()->value,
+            'created_at' => $task->getCreatedAt()->format(DATE_ATOM),
+        ];
     }
 }

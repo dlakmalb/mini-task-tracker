@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Dto;
+namespace App\DTO;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-class ProjectCreateRequest
+class CreateProjectRequestDTO
 {
     #[Assert\NotBlank(message: 'Project name is required.')]
     public ?string $name = null;

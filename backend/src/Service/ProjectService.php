@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\DTO\CreateProjectRequestDTO;
 use App\Entity\Project;
 use App\Repository\ProjectRepository;
 
@@ -20,12 +21,12 @@ class ProjectService
         return $this->projectRepository->findBy([], ['createdAt' => 'DESC']);
     }
 
-    public function createProject(string $name, ?string $description): Project
+    public function createProject(CreateProjectRequestDTO $dto): Project
     {
         $project = new Project();
 
-        $project->setName($name);
-        $project->setDescription($description);
+        $project->setName($dto->name);
+        $project->setDescription($dto->description);
 
         $this->projectRepository->save($project, true);
 

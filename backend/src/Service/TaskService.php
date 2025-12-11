@@ -2,8 +2,8 @@
 
 namespace App\Service;
 
-use App\Dto\TaskCreateRequest;
-use App\Dto\TaskUpdateRequest;
+use App\DTO\CreateTaskRequestDTO;
+use App\DTO\UpdateTaskRequestDTO;
 use App\Entity\Project;
 use App\Entity\Task;
 use App\Enum\TaskPriority;
@@ -28,12 +28,12 @@ class TaskService
     public function getTasksForProject(
         Project $project,
         ?TaskStatus $status,
-        ?string $search,
+        ?string $title,
     ): array {
-        return $this->taskRepository->findByProjectAndFilters($project, $status, $search);
+        return $this->taskRepository->findByProjectAndFilters($project, $status, $title);
     }
 
-    public function createForProject(Project $project, TaskCreateRequest $dto): Task
+    public function createForProject(Project $project, CreateTaskRequestDTO $dto): Task
     {
         // Create new Task
         $task = new Task();
@@ -55,7 +55,7 @@ class TaskService
         return $task;
     }
 
-    public function updateTask(Task $task, TaskUpdateRequest $dto): Task
+    public function updateTask(Task $task, UpdateTaskRequestDTO $dto): Task
     {
         // Status update
         if (null !== $dto->status) {

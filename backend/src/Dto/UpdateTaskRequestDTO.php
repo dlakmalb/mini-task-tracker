@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Dto;
+namespace App\DTO;
 
-class TaskUpdateRequest
+class UpdateTaskRequestDTO
 {
     public ?string $status = null;
     public ?string $priority = null;
