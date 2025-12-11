@@ -23,14 +23,22 @@ class TaskService
     }
 
     /**
-     * @return Task[]
+     * @return array{0: Task[], 1: int} [tasks, total]
      */
     public function getTasksForProject(
         Project $project,
         ?TaskStatus $status,
         ?string $title,
+        int $page,
+        int $limit,
     ): array {
-        return $this->taskRepository->findByProjectAndFilters($project, $status, $title);
+        return $this->taskRepository->findByProjectAndFilters(
+            project: $project,
+            status: $status,
+            title: $title,
+            page: $page,
+            limit: $limit,
+        );
     }
 
     public function createForProject(Project $project, CreateTaskRequestDTO $dto): Task

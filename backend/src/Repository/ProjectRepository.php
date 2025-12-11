@@ -16,6 +16,31 @@ class ProjectRepository extends ServiceEntityRepository
         parent::__construct($registry, Project::class);
     }
 
+    /**
+     * @return array{0: Project[], 1: int} [projects, total]
+     */
+    public function findPaginatedProjects(int $page, int $limit): array
+    {
+        $queryBuilder = $this->createQueryBuilder('project')
+            ->orderBy('project.createdAt', 'DESC');
+
+        // clone for count
+        $countQueryBuilder = clone $queryBuilder;
+
+        $total = (int) $countQueryBuilder
+            ->select('COUNT(project.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        // Apply pagination
+        $queryBuilder->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit);
+
+        $projects = $queryBuilder->getQuery()->getResult();
+
+        return [$projects, $total];
+    }
+
     public function save(Project $project, bool $flush = false): void
     {
         $em = $this->getEntityManager();

@@ -7,15 +7,17 @@ use App\DTO\UpdateTaskRequestDTO;
 use App\Entity\Task;
 use App\Enum\TaskPriority;
 use App\Enum\TaskStatus;
+use App\Helper\PaginationHelper;
 use App\Repository\ProjectRepository;
 use App\Service\TaskService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class TaskController
+final class TaskController extends AbstractController
 {
     public function __construct(
         private readonly ProjectRepository $projectRepository,
@@ -57,8 +59,16 @@ class TaskController
             }
         }
 
+        [$page, $limit] = PaginationHelper::fromRequest($request);
+
         // Get tasks from service
-        $tasks = $this->taskService->getTasksForProject($project, $status, $title);
+        [$tasks, $total] = $this->taskService->getTasksForProject(
+            project: $project,
+            status: $status,
+            title: $title,
+            page: $page,
+            limit: $limit,
+        );
 
         // Format response data
         $data = array_map(
@@ -66,7 +76,15 @@ class TaskController
             $tasks
         );
 
-        return new JsonResponse($data, JsonResponse::HTTP_OK);
+        return new JsonResponse([
+            'data' => $data,
+            'meta' => [
+                'page' => $page,
+                'limit' => $limit,
+                'total' => $total,
+                'totalPages' => (int) ceil($total / $limit),
+            ],
+        ], JsonResponse::HTTP_OK);
     }
 
     /**
