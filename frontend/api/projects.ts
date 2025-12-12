@@ -45,16 +45,16 @@ export const createProject = async (payload: CreateProjectPayload) => {
   const url = new URL(`${API_BASE_URL}/projects`);
 
   const res = await fetch(url.toString(), {
-    method: "POST",
+    method: 'POST',
     headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify(payload),
   });
 
   if (!res.ok) {
-    let message = "Failed to create project";
+    let message = 'Failed to create project';
     try {
       const body = await res.json();
       if (body?.message) message = body.message;

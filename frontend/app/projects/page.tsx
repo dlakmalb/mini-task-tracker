@@ -12,27 +12,18 @@ export default function ProjectsPage() {
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const {
-    projects,
-    loading,
-    error,
-    page,
-    pageSize,
-    total,
-    setPage,
-    setPageSize,
-    reload,
-  } = useProjects(8);
+  const { projects, loading, error, page, pageSize, total, setPage, setPageSize, reload } =
+    useProjects(8);
 
   const handleCreate = async (payload: CreateProjectPayload) => {
     setSubmitting(true);
     try {
       await createProject(payload);
-      message.success("Project created");
+      message.success('Project created');
       setOpen(false);
       await reload();
     } catch (e) {
-      message.error(e instanceof Error ? e.message : "Failed to create project");
+      message.error(e instanceof Error ? e.message : 'Failed to create project');
       throw e;
     } finally {
       setSubmitting(false);
@@ -41,12 +32,8 @@ export default function ProjectsPage() {
 
   return (
     <>
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
-        <Button
-          type="default"
-          icon={<PlusCircleOutlined />}
-          onClick={() => setOpen(true)}
-        >
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+        <Button type="default" icon={<PlusCircleOutlined />} onClick={() => setOpen(true)}>
           New
         </Button>
       </div>
