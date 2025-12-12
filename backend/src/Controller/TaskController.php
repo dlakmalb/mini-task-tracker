@@ -216,12 +216,12 @@ final class TaskController extends AbstractController
     {
         return [
             'id' => $task->getId(),
-            'project_id' => $task->getProject()->getId(),
+            'projectId' => $task->getProject()->getId(),
             'title' => $task->getTitle(),
             'description' => $task->getDescription(),
             'status' => $task->getStatus()->value,
             'priority' => $task->getPriority()->value,
-            'created_at' => $task->getCreatedAt()->format(DATE_ATOM),
+            'createdAt' => $task->getCreatedAt()->format(DATE_ATOM),
         ];
     }
 }

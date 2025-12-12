@@ -37,12 +37,9 @@ final class ProjectController extends AbstractController
 
             return new JsonResponse([
                 'data' => $data,
-                'meta' => [
-                    'page' => $page,
-                    'limit' => $limit,
-                    'total' => $total,
-                    'totalPages' => (int) ceil($total / $limit),
-                ],
+                'page' => $page,
+                'limit' => $limit,
+                'total' => $total,
             ], JsonResponse::HTTP_OK);
         } catch (\Throwable $e) {
             return new JsonResponse(
@@ -93,7 +90,7 @@ final class ProjectController extends AbstractController
             'id' => $project->getId(),
             'name' => $project->getName(),
             'description' => $project->getDescription(),
-            'created_at' => $project->getCreatedAt()->format(DATE_ATOM),
+            'createdAt' => $project->getCreatedAt()->format(DATE_ATOM),
         ];
     }
 }

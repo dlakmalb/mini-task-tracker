@@ -1,0 +1,23 @@
+.table :global(.ant-table) {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table :global(.ant-table-thead > tr > th) {
+  background: #f0f2f5 !important;
+  font-weight: 600;
+}
+
+.row {
+  cursor: pointer;
+  position: relative;
+}
+
+:global(tr:hover) .hoverIcon {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+:global(.ant-table-tbody > tr:hover > td) {
+  background: #e6f4ff !important;
+}
