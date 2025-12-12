@@ -3,10 +3,7 @@
 import React from "react";
 import { Button, Form, Input } from "antd";
 
-export type CreateProjectPayload = {
-  name: string;
-  description?: string;
-};
+import type { CreateProjectPayload } from "@/api/projects";
 
 type Props = {
   onSubmit: (payload: CreateProjectPayload) => Promise<void>;
@@ -18,8 +15,12 @@ const ProjectCreateForm = ({ onSubmit, onCancel, submitting }: Props) => {
   const [form] = Form.useForm<CreateProjectPayload>();
 
   const handleFinish = async (values: CreateProjectPayload) => {
-    await onSubmit(values);
-    form.resetFields();
+    try {
+      await onSubmit(values);
+      form.resetFields();
+    } catch {
+      // keep the form values so the user can adjust and retry
+    }
   };
 
   return (

@@ -1,11 +1,10 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { Skeleton, Table, Typography } from 'antd';
+import { Table, Typography } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useRouter } from 'next/navigation';
 
-import { useProjects } from '@/hooks/useProjects';
 import type { Project } from '@/types';
 import styles from './ProjectsTable.module.css';
 
@@ -21,10 +20,28 @@ const formatDateTime = (value?: string) => {
   });
 };
 
-export default function ProjectsTable() {
-  const router = useRouter();
+type Props = {
+  projects: Project[];
+  loading: boolean;
+  error: string | null;
+  page: number;
+  pageSize: number;
+  total: number;
+  setPage: (page: number) => void;
+  setPageSize: (size: number) => void;
+};
 
-  const { projects, loading, error, page, pageSize, total, setPage, setPageSize } = useProjects(8);
+export default function ProjectsTable({
+  projects,
+  loading,
+  error,
+  page,
+  pageSize,
+  total,
+  setPage,
+  setPageSize,
+}: Props) {
+  const router = useRouter();
 
   const columns: ColumnsType<Project> = useMemo(
     () => [
@@ -55,10 +72,6 @@ export default function ProjectsTable() {
     [],
   );
 
-  if (loading) {
-    return <Skeleton active paragraph={{ rows: 6 }} />;
-  }
-
   return (
     <>
       {error && (
@@ -70,7 +83,7 @@ export default function ProjectsTable() {
       <Table<Project>
         rowKey="id"
         className={styles.table}
-        loading={false}
+        loading={loading}
         columns={columns}
         dataSource={projects}
         pagination={{

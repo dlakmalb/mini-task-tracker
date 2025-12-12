@@ -5,14 +5,24 @@ import { Button, message, Modal } from 'antd';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { useProjects } from '@/hooks/useProjects';
-import ProjectCreateForm, { CreateProjectPayload } from '@/components/projects/ProjectCreateForm';
-import { createProject } from '@/api/projects';
+import ProjectCreateForm from '@/components/projects/ProjectCreateForm';
+import { createProject, type CreateProjectPayload } from '@/api/projects';
 
 export default function ProjectsPage() {
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const { reload } = useProjects(8);
+  const {
+    projects,
+    loading,
+    error,
+    page,
+    pageSize,
+    total,
+    setPage,
+    setPageSize,
+    reload,
+  } = useProjects(8);
 
   const handleCreate = async (payload: CreateProjectPayload) => {
     setSubmitting(true);
@@ -23,6 +33,7 @@ export default function ProjectsPage() {
       await reload();
     } catch (e) {
       message.error(e instanceof Error ? e.message : "Failed to create project");
+      throw e;
     } finally {
       setSubmitting(false);
     }
@@ -40,7 +51,16 @@ export default function ProjectsPage() {
         </Button>
       </div>
 
-      <ProjectsTable />
+      <ProjectsTable
+        projects={projects}
+        loading={loading}
+        error={error}
+        page={page}
+        pageSize={pageSize}
+        total={total}
+        setPage={setPage}
+        setPageSize={setPageSize}
+      />
 
       <Modal
         title="Create Project"
