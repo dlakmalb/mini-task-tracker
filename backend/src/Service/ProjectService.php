@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\DTO\CreateProjectRequestDTO;
 use App\Entity\Project;
 use App\Repository\ProjectRepository;
 
@@ -13,19 +14,19 @@ class ProjectService
     }
 
     /**
-     * @return Project[]
+     * @return array{0: Project[], 1: int} [projects, total]
      */
-    public function getAllProjects(): array
+    public function getPaginatedProjects(int $page, int $limit): array
     {
-        return $this->projectRepository->findBy([], ['createdAt' => 'DESC']);
+        return $this->projectRepository->findPaginatedProjects($page, $limit);
     }
 
-    public function createProject(string $name, ?string $description): Project
+    public function createProject(CreateProjectRequestDTO $dto): Project
     {
         $project = new Project();
 
-        $project->setName($name);
-        $project->setDescription($description);
+        $project->setName($dto->name);
+        $project->setDescription($dto->description);
 
         $this->projectRepository->save($project, true);
 

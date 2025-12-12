@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Dto;
+namespace App\DTO;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-class TaskCreateRequest
+class CreateTaskRequestDTO
 {
     #[Assert\NotBlank(message: 'Title is required.')]
     public ?string $title = null;

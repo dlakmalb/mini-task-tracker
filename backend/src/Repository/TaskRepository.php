@@ -19,28 +19,43 @@ class TaskRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return Task[]
+     * @return array{0: Task[], 1: int} [tasks, total]
      */
     public function findByProjectAndFilters(
         Project $project,
         ?TaskStatus $status,
-        ?string $search,
+        ?string $title,
+        int $page,
+        int $limit,
     ): array {
-        $qb = $this->createQueryBuilder('task')
+        $queryBuilder = $this->createQueryBuilder('task')
             ->andWhere('task.project = :project')
             ->setParameter('project', $project)
             ->orderBy('task.createdAt', 'DESC');
 
         if (null !== $status) {
-            $qb->andWhere('task.status = :status')
+            $queryBuilder->andWhere('task.status = :status')
                ->setParameter('status', $status->value);
         }
 
-        if (null !== $search && '' !== $search) {
-            $qb->andWhere('LOWER(task.title) LIKE :q')
-               ->setParameter('q', '%'.mb_strtolower($search).'%');
+        if (null !== $title && '' !== $title) {
+            $queryBuilder->andWhere('LOWER(task.title) LIKE :title')
+               ->setParameter('title', '%'.mb_strtolower($title).'%');
         }
 
-        return $qb->getQuery()->getResult();
+        $countQueryBuilder = clone $queryBuilder;
+
+        $total = (int) $countQueryBuilder
+            ->select('COUNT(task.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        // Apply pagination
+        $queryBuilder->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit);
+
+        $tasks = $queryBuilder->getQuery()->getResult();
+
+        return [$tasks, $total];
     }
 }
