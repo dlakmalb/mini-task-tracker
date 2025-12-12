@@ -4,7 +4,7 @@
 }
 
 .table :global(.ant-table-thead > tr > th) {
-  background: #f0f2f5 !important; /* subtle sharp */
+  background: #f0f2f5 !important;
   font-weight: 600;
 }
 
