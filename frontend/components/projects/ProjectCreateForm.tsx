@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Button, Form, Input } from 'antd';
-
 import type { CreateProjectPayload } from '@/api/projects';
 
 type Props = {
@@ -29,7 +28,7 @@ const ProjectCreateForm = ({ onSubmit, onCancel, submitting }: Props) => {
         name="name"
         label="Project Name"
         rules={[
-          { required: true, message: 'Project name is required' },
+          { required: true, whitespace: true, message: 'Project name is required' },
           { min: 3, message: 'Project name must be at least 3 characters' },
           { max: 80, message: 'Project name must be 80 characters or less' },
         ]}

@@ -56,15 +56,17 @@ class TaskService
         $priority = TaskPriority::from($dto->priority);
         $task->setPriority($priority);
 
-        $em = $this->taskRepository->getEntityManager();
-        $em->persist($task);
-        $em->flush();
+        $this->em->persist($task);
+        $this->em->flush();
 
         return $task;
     }
 
     public function updateTask(Task $task, UpdateTaskRequestDTO $dto): Task
     {
+        $task->setTitle(trim((string) $dto->title));
+        $task->setDescription($dto->description ? trim($dto->description) : null);
+
         // Status update
         if (null !== $dto->status) {
             $current = $task->getStatus();

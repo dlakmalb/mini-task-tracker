@@ -1,8 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Project } from '@/types';
-import { getProjects } from '@/api/projects';
+import { getProjects, PaginatedProjectsResponse } from '@/api/projects';
 
 type UseProjectsResult = {
   projects: Project[];
@@ -28,12 +28,19 @@ export const useProjects = (initialPageSize = 10): UseProjectsResult => {
   const [pageSize, setPageSize] = useState(initialPageSize);
   const [total, setTotal] = useState(0);
 
+  const inFlightKeyRef = useRef<string | null>(null);
+
   const load = useCallback(async (p: number, ps: number) => {
+    const key = `${p}:${ps}`;
+
+    if (inFlightKeyRef.current === key) return;
+    inFlightKeyRef.current = key;
+
     try {
       setLoading(true);
       setError(null);
 
-      const data = await getProjects(p, ps);
+      const data: PaginatedProjectsResponse = await getProjects(p, ps);
 
       setProjects(data.data);
       setTotal(data.total);
@@ -42,6 +49,7 @@ export const useProjects = (initialPageSize = 10): UseProjectsResult => {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
+      inFlightKeyRef.current = null;
     }
   }, []);
 

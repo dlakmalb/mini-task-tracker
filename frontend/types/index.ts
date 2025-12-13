@@ -16,4 +16,5 @@ export type Task = {
   status: TaskStatus;
   priority: TaskPriority;
   createdAt: string;
+  allowedTransitions: TaskStatus[];
 };

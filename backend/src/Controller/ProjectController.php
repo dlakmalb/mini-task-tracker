@@ -56,27 +56,36 @@ final class ProjectController extends AbstractController
     public function create(
         Request $request,
         ValidatorInterface $validator,
-        ProjectService $projectService,
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
 
         $dto = new CreateProjectRequestDTO();
+        $dto->name = isset($data['name']) ? trim((string) $data['name']) : null;
+        $dto->description = isset($data['description'])
+            ? trim((string) $data['description'])
+            : null;
 
-        $dto->name = $data['name'] ?? null;
-        $dto->description = $data['description'] ?? null;
+        if ($dto->description === '') {
+            $dto->description = null;
+        }
 
         // Validate input
         $errors = $validator->validate($dto);
 
         if (count($errors) > 0) {
+            $formatted = [];
+            foreach ($errors as $error) {
+                $formatted[$error->getPropertyPath()][] = $error->getMessage();
+            }
+
             return new JsonResponse(
-                ['error' => (string) $errors],
+                ['message' => 'Validation failed', 'errors' => $formatted],
                 JsonResponse::HTTP_BAD_REQUEST
             );
         }
 
         // Create project
-        $project = $projectService->createProject($dto);
+        $project = $this->projectService->createProject($dto);
 
         return new JsonResponse(
             $this->organiseProjectData($project),

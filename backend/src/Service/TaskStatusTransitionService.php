@@ -9,9 +9,9 @@ final class TaskStatusTransitionService
     public function canTransition(TaskStatus $from, TaskStatus $to): bool
     {
         return match ($from) {
-            TaskStatus::TODO => in_array($to, [TaskStatus::IN_PROGRESS, TaskStatus::DONE], true),
-            TaskStatus::IN_PROGRESS => TaskStatus::DONE === $to,
-            TaskStatus::DONE => false,
+            TaskStatus::TODO => in_array($to, [TaskStatus::TODO ,TaskStatus::IN_PROGRESS, TaskStatus::DONE], true),
+            TaskStatus::IN_PROGRESS => in_array($to, [TaskStatus::IN_PROGRESS, TaskStatus::DONE], true),
+            TaskStatus::DONE => TaskStatus::DONE === $to,
         };
     }
 

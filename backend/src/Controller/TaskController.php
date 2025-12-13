@@ -10,6 +10,7 @@ use App\Enum\TaskStatus;
 use App\Helper\PaginationHelper;
 use App\Repository\ProjectRepository;
 use App\Service\TaskService;
+use App\Service\TaskStatusTransitionService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,6 +24,7 @@ final class TaskController extends AbstractController
         private readonly ProjectRepository $projectRepository,
         private readonly TaskService $taskService,
         private readonly EntityManagerInterface $em,
+        private readonly TaskStatusTransitionService $taskStatusTransitionService,
     ) {
     }
 
@@ -78,12 +80,10 @@ final class TaskController extends AbstractController
 
         return new JsonResponse([
             'data' => $data,
-            'meta' => [
-                'page' => $page,
-                'limit' => $limit,
-                'total' => $total,
-                'totalPages' => (int) ceil($total / $limit),
-            ],
+            'page' => $page,
+            'limit' => $limit,
+            'total' => $total,
+            'totalPages' => (int) ceil($total / $limit),
         ], JsonResponse::HTTP_OK);
     }
 
@@ -108,17 +108,26 @@ final class TaskController extends AbstractController
         $data = json_decode($request->getContent(), true) ?? [];
 
         $dto = new CreateTaskRequestDTO();
-        $dto->title = $data['title'] ?? null;
-        $dto->description = $data['description'] ?? null;
+        $dto->title = isset($data['title']) ? trim((string) $data['title']) : null;
+        $dto->description = isset($data['description']) ? trim((string) $data['description']) : null;
         $dto->status = $data['status'] ?? null;
         $dto->priority = $data['priority'] ?? null;
+
+        if ($dto->description === '') {
+            $dto->description = null;
+        }
 
         // Validate DTO
         $errors = $validator->validate($dto);
 
         if (count($errors) > 0) {
+            $formatted = [];
+            foreach ($errors as $error) {
+                $formatted[$error->getPropertyPath()][] = $error->getMessage();
+            }
+
             return new JsonResponse(
-                ['error' => (string) $errors],
+                ['message' => 'Validation failed', 'errors' => $formatted],
                 JsonResponse::HTTP_BAD_REQUEST
             );
         }
@@ -143,10 +152,10 @@ final class TaskController extends AbstractController
         return new JsonResponse($this->organiseTaskData($task), JsonResponse::HTTP_CREATED);
     }
 
-    #[Route('/api/tasks/{id}', name: 'api_tasks_update', methods: ['PATCH'])]
-    public function update(int $id, Request $request): JsonResponse
+    #[Route('/api/projects/{projectId}/tasks/{taskId}', name: 'api_project_tasks_update', methods: ['PATCH'])]
+    public function update(int $taskId, Request $request): JsonResponse
     {
-        $task = $this->em->getRepository(Task::class)->find($id);
+        $task = $this->em->getRepository(Task::class)->find($taskId);
 
         if (!$task) {
             return new JsonResponse(
@@ -158,6 +167,8 @@ final class TaskController extends AbstractController
         $data = json_decode($request->getContent(), true) ?? [];
 
         $dto = new UpdateTaskRequestDTO();
+        $dto->title = isset($data['title']) ? trim((string) $data['title']) : null;
+        $dto->description = isset($data['description']) ? trim((string) $data['description']) : null;
         $dto->status = $data['status'] ?? null;
         $dto->priority = $data['priority'] ?? null;
 
@@ -195,10 +206,10 @@ final class TaskController extends AbstractController
         return new JsonResponse($this->organiseTaskData($task), JsonResponse::HTTP_OK);
     }
 
-    #[Route('/api/tasks/{id}', name: 'api_tasks_delete', methods: ['DELETE'])]
-    public function delete(int $id): JsonResponse
+    #[Route('/api/projects/{projectId}/tasks/{taskId}', name: 'api_project_tasks_delete', methods: ['DELETE'])]
+    public function delete(int $taskId): JsonResponse
     {
-        $task = $this->em->getRepository(Task::class)->find($id);
+        $task = $this->em->getRepository(Task::class)->find($taskId);
 
         if (!$task) {
             return new JsonResponse(
