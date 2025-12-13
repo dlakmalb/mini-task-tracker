@@ -1,5 +1,4 @@
 .table :global(.ant-table) {
-  border-radius: 12px;
   overflow: hidden;
 }
 
@@ -13,11 +12,11 @@
   position: relative;
 }
 
+.table :global(.ant-table-tbody > tr:not(.ant-table-placeholder):hover > td) {
+  background: #e6f4ff !important;
+}
+
 :global(tr:hover) .hoverIcon {
   opacity: 1;
   transform: translateX(0);
-}
-
-:global(.ant-table-tbody > tr:hover > td) {
-  background: #e6f4ff !important;
 }

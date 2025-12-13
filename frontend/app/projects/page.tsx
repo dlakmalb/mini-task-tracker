@@ -8,7 +8,7 @@ import { useProjects } from '@/hooks/useProjects';
 import ProjectCreateForm from '@/components/projects/ProjectCreateForm';
 import { createProject, type CreateProjectPayload } from '@/api/projects';
 
-export default function ProjectsPage() {
+const ProjectsPage = () => {
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -66,4 +66,6 @@ export default function ProjectsPage() {
       </Modal>
     </>
   );
-}
+};
+
+export default ProjectsPage;

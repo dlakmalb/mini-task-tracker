@@ -61,6 +61,7 @@ export const createProject = async (payload: CreateProjectPayload) => {
     } catch {
       /* ignore */
     }
+
     throw new Error(message);
   }
 

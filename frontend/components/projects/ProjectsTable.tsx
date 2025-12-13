@@ -6,19 +6,8 @@ import type { ColumnsType } from 'antd/es/table';
 import { useRouter } from 'next/navigation';
 
 import type { Project } from '@/types';
-import styles from './ProjectsTable.module.css';
-
-const formatDateTime = (value?: string) => {
-  if (!value) return '-';
-
-  return new Date(value).toLocaleString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-};
+import styles from '../shared/TableStyles.module.css';
+import { formatDateTime } from '@/app/utils/date';
 
 type Props = {
   projects: Project[];
@@ -31,7 +20,7 @@ type Props = {
   setPageSize: (size: number) => void;
 };
 
-export default function ProjectsTable({
+const ProjectsTable = ({
   projects,
   loading,
   error,
@@ -40,7 +29,7 @@ export default function ProjectsTable({
   total,
   setPage,
   setPageSize,
-}: Props) {
+}: Props) => {
   const router = useRouter();
 
   const columns: ColumnsType<Project> = useMemo(
@@ -49,6 +38,7 @@ export default function ProjectsTable({
         title: 'Project Name',
         dataIndex: 'name',
         key: 'name',
+        ellipsis: true,
         render: (value: string) => <Typography.Text strong>{value}</Typography.Text>,
       },
       {
@@ -103,4 +93,6 @@ export default function ProjectsTable({
       />
     </>
   );
-}
+};
+
+export default ProjectsTable;
