@@ -8,12 +8,15 @@ import { Task } from '@/types';
 import { message } from 'antd';
 import { useState } from 'react';
 import TaskUpsertModal from './TaskUpsertModal';
+import { useRouter } from 'next/navigation';
 
 type Props = {
   projectId: string;
 };
 
 const TasksClient = ({ projectId }: Props) => {
+  const router = useRouter();
+
   const {
     tasks,
     loading,
@@ -93,6 +96,7 @@ const TasksClient = ({ projectId }: Props) => {
         status={status}
         onSearchChange={setTitle}
         onStatusChange={setStatus}
+        onBack={() => router.push('/projects')}
       />
 
       <TasksTable
