@@ -2,6 +2,7 @@
     <h1>
         📋 Mini Task Tracker<br/>
         <sub><sup><sub>Track projects and tasks in one place.</sub></sup></sub><br/>
+        <sub><sup><sub>Visit for a demo: https://mini-task-tracker-dlakmalb.vercel.app/</sub></sup></sub><br/>
     </h1>
 </div>
 <br/>
