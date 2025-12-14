@@ -72,23 +72,6 @@ MySQL (host access)	  | localhost:3307
 ───────────────────────────────────────────────
 ```
 
-🧪 Database Setup & Migrations
-
-Run database migrations:
-```
-docker compose exec backend php bin/console doctrine:migrations:migrate --no-interaction
-```
-
-Validate schema:
-```
-docker compose exec backend php bin/console doctrine:schema:validate
-```
-
-Check migration status:
-```
-docker compose exec backend php bin/console doctrine:migrations:status
-```
-
 🔄 Reset the Environment (Fresh Start)
 
 ⚠️ This will delete all database data.
@@ -120,10 +103,6 @@ php bin/console doctrine:migrations:migrate
 ```
 
 4️⃣ Start backend server
-```
-symfony serve
-```
-Or
 ```
 php -S localhost:8000 -t public
 ```
